@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Jost:wght@300;400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Jost", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "IM Fell English", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+:root {
+  --ink: #1a1917;
+  --ink-muted: #6b6760;
+  --ink-faint: #b0ada8;
+  --paper: #faf9f7;
+  --paper-warm: #f2efe9;
+  --accent: #7a5c3a;
+  --accent-light: #c4a882;
+}
+
+body {
+  @apply bg-[#faf9f7] text-[#1a1917] antialiased min-h-screen overflow-x-hidden;
+  font-family: var(--font-sans);
+  font-weight: 300;
+}

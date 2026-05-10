@@ -1,0 +1,71 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 3. Primitive Definitions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isEmailVerified() && (
+        request.auth.token.email == 'amanshurag@gmail.com'
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // 2. Validation Blueprints
+    function isValidMemory(data) {
+      return data.keys().hasAll(['name', 'object', 'memory', 'verified', 'createdAt', 'place', 'type'])
+        && data.keys().size() <= 11
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.place is string && data.place.size() <= 100
+        && data.object is string && data.object.size() > 0 && data.object.size() <= 200
+        && data.memory is string && data.memory.size() > 0 && data.memory.size() <= 2000
+        && data.type is string && data.type.size() <= 50
+        && data.verified is bool
+        && data.createdAt is timestamp
+        && (!data.keys().hasAny(['userId']) || data.userId == request.auth.uid)
+        && (!data.keys().hasAny(['image']) || (data.image is string && data.image.size() <= 1000))
+        && (!data.keys().hasAny(['audio']) || (data.audio is string && data.audio.size() <= 1000000));
+    }
+
+    match /memories/{memoryId} {
+      // 8. Secure List Queries
+      allow read: if (isAdmin() || (existing().verified == true));
+      
+      allow create: if (
+        isEmailVerified() && 
+        isValidMemory(incoming()) && 
+        incoming().verified == false &&
+        incoming().createdAt == request.time
+      );
+
+      allow update: if (
+        isAdmin() && 
+        isValidMemory(incoming())
+      );
+
+      allow delete: if isAdmin();
+    }
+  }
+}

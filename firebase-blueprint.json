@@ -1,0 +1,29 @@
+{
+  "entities": {
+    "memory": {
+      "title": "Memory Offering",
+      "description": "A stone of remembrance placed on the monument",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Name of the person offering" },
+        "place": { "type": "string", "description": "Place of origin" },
+        "object": { "type": "string", "description": "The physical object remembered" },
+        "memory": { "type": "string", "description": "The story associated with the object" },
+        "type": { "type": "string", "description": "Type of media (photograph, sketch, etc.)" },
+        "date": { "type": "string", "description": "Month and year of offering" },
+        "image": { "type": "string", "description": "URL to the image of the object" },
+        "audio": { "type": "string", "description": "URL or base64 of the audio whisper" },
+        "verified": { "type": "boolean", "description": "Whether the offering has been approved by the curator" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "userId": { "type": "string", "description": "UID of the submitter if authenticated" }
+      },
+      "required": ["name", "object", "memory", "verified"]
+    }
+  },
+  "firestore": {
+    "memories": {
+      "schema": "memory",
+      "description": "Public and pending offerings for the monument"
+    }
+  }
+}
