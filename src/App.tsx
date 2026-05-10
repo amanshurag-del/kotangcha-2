@@ -10,7 +10,8 @@ import {
   auth, 
   googleProvider, 
   OperationType, 
-  handleFirestoreError 
+  handleFirestoreError,
+  uploadFile
 } from './lib/firebase';
 import { 
   collection, 
@@ -73,11 +74,6 @@ export default function App() {
         ...d.data()
       })) as MemoryEntry[];
       
-      // If empty and curator, seed initial data (or just show empty)
-      if (docs.length === 0 && isCurator) {
-        // We could seed here if needed, but safer to let curator add manually
-      }
-      
       setMemories(docs);
     }, (err) => {
       handleFirestoreError(err, OperationType.LIST, 'memories');
@@ -86,15 +82,34 @@ export default function App() {
     return unsubscribe;
   }, [isCurator]);
 
-  const addMemory = async (entry: Omit<MemoryEntry, 'id'>) => {
+  const addMemory = async (entry: Omit<MemoryEntry, 'id'> & { imageFile?: File, audioFile?: File }) => {
     try {
-      const memoriesRef = collection(db, 'memories');
-      await addDoc(memoriesRef, {
-        ...entry,
+      const { imageFile, audioFile, ...data } = entry;
+      let imageUrl = (data as any).image || null;
+      let audioUrl = (data as any).audio || null;
+
+      // Handle File Uploads
+      if (imageFile) {
+        imageUrl = await uploadFile(imageFile, 'images');
+      }
+      if (audioFile) {
+        audioUrl = await uploadFile(audioFile, 'audio');
+      }
+
+      const memoryData: any = {
+        ...data,
+        image: imageUrl,
+        audio: audioUrl,
         verified: isCurator, // Auto-verify if added by creator/curator
         createdAt: serverTimestamp(),
-        userId: user?.uid || null
-      });
+      };
+
+      if (user?.uid) {
+        memoryData.userId = user.uid;
+      }
+
+      const memoriesRef = collection(db, 'memories');
+      await addDoc(memoriesRef, memoryData);
     } catch (err) {
       handleFirestoreError(err, OperationType.CREATE, 'memories');
     }
@@ -145,7 +160,7 @@ export default function App() {
       {/* Navigation */}
       <nav className="fixed top-0 left-0 w-full h-[50px] z-[100] flex items-center justify-between px-6 md:px-8 bg-[#faf9f7]/95 backdrop-blur-md border-b border-black/5">
         <div className="flex items-center h-full gap-4 md:gap-8 font-sans font-medium text-[9px] md:text-[10px] tracking-[0.1em] md:tracking-[0.15em] uppercase text-[#b0ada8] whitespace-nowrap">
-          <div className="hidden sm:flex items-center gap-1.5 h-full">
+          <div className="flex items-center gap-1.5 h-full">
             <span className="text-[#a36910] font-semibold">{memories.length}</span>
             <span>MEMORIES</span>
           </div>

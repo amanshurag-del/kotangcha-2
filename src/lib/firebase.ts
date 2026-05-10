@@ -16,12 +16,20 @@ import {
   serverTimestamp
 } from 'firebase/firestore';
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth(app);
+export const storage = getStorage(app);
 export const googleProvider = new GoogleAuthProvider();
+
+export async function uploadFile(file: File, path: string): Promise<string> {
+  const fileRef = ref(storage, `${path}/${Date.now()}_${file.name}`);
+  await uploadBytes(fileRef, file);
+  return getDownloadURL(fileRef);
+}
 
 // Error handling based on integration guidelines
 export enum OperationType {

@@ -35,18 +35,19 @@ service cloud.firestore {
 
     // 2. Validation Blueprints
     function isValidMemory(data) {
-      return data.keys().hasAll(['name', 'object', 'memory', 'verified', 'createdAt', 'place', 'type'])
-        && data.keys().size() <= 11
+      return data.keys().hasAll(['name', 'object', 'memory', 'verified', 'createdAt', 'place', 'type', 'date'])
+        && data.keys().size() <= 12
         && data.name is string && data.name.size() > 0 && data.name.size() <= 100
         && data.place is string && data.place.size() <= 100
         && data.object is string && data.object.size() > 0 && data.object.size() <= 200
         && data.memory is string && data.memory.size() > 0 && data.memory.size() <= 2000
         && data.type is string && data.type.size() <= 50
+        && data.date is string && data.date.size() <= 100
         && data.verified is bool
         && data.createdAt is timestamp
-        && (!data.keys().hasAny(['userId']) || data.userId == request.auth.uid)
-        && (!data.keys().hasAny(['image']) || (data.image is string && data.image.size() <= 1000))
-        && (!data.keys().hasAny(['audio']) || (data.audio is string && data.audio.size() <= 1000000));
+        && (!data.keys().hasAny(['userId']) || (data.userId == request.auth.uid || data.userId == null))
+        && (!data.keys().hasAny(['image']) || (data.image is string || data.image == null))
+        && (!data.keys().hasAny(['audio']) || (data.audio is string || data.audio == null));
     }
 
     match /memories/{memoryId} {
@@ -54,7 +55,6 @@ service cloud.firestore {
       allow read: if (isAdmin() || (existing().verified == true));
       
       allow create: if (
-        isEmailVerified() && 
         isValidMemory(incoming()) && 
         incoming().verified == false &&
         incoming().createdAt == request.time

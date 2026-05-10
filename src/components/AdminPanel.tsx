@@ -18,44 +18,49 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   isOpen, onClose, onAdd, onUpdateSettings, showDate, onExport, onImport, onClear 
 }) => {
   const [form, setForm] = useState({
-    name: '', place: '', object: '', memory: '', type: 'offering'
+    name: '', place: '', object: '', memory: '', type: 'whisper'
   });
-  const [fileData, setFileData] = useState<string | null>(null);
-  const [audioData, setAudioData] = useState<string | null>(null);
-  const [audioName, setAudioName] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setImageFile(file);
     const reader = new FileReader();
-    reader.onload = (ev) => setFileData(ev.target?.result as string);
+    reader.onload = (ev) => setImagePreview(ev.target?.result as string);
     reader.readAsDataURL(file);
   };
 
   const handleAudioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setAudioData(ev.target?.result as string);
-      setAudioName(file.name);
-    };
-    reader.readAsDataURL(file);
+    setAudioFile(file);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!form.name && !form.memory && !form.object) return;
-    onAdd({
-      ...form,
-      image: fileData,
-      audio: audioData,
-      date: new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })
-    });
-    setForm({ name: '', place: '', object: '', memory: '', type: 'offering' });
-    setFileData(null);
-    setAudioData(null);
-    setAudioName(null);
-    onClose();
+    setIsSubmitting(true);
+    try {
+      await onAdd({
+        ...form,
+        imageFile: imageFile,
+        audioFile: audioFile,
+        date: new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })
+      } as any); // Type assertion to handle temporary File transport
+      setForm({ name: '', place: '', object: '', memory: '', type: 'whisper' });
+      setImageFile(null);
+      setAudioFile(null);
+      setImagePreview(null);
+      onClose();
+    } catch (err) {
+      console.error("Admin add failed:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -78,8 +83,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               {/* Image Upload */}
               <label className="block border-2 border-dashed border-black/10 rounded-sm p-6 text-center cursor-pointer hover:bg-[#f2efe9]/50 transition-colors">
                 <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-                {fileData ? (
-                  <img src={fileData} alt="" className="max-h-32 mx-auto rounded-sm" />
+                {imagePreview ? (
+                  <img src={imagePreview} alt="" className="max-h-32 mx-auto rounded-sm" />
                 ) : (
                   <div className="space-y-1">
                     <Upload className="mx-auto w-5 h-5 text-[#b0ada8] mb-2" />
@@ -94,10 +99,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 <label className="text-[10px] uppercase font-medium tracking-widest text-[#6b6760]">Sound Offering</label>
                 <label className="block border border-black/10 rounded-sm p-4 text-center cursor-pointer hover:bg-[#f2efe9]/50 transition-colors">
                   <input type="file" accept="audio/*" onChange={handleAudioChange} className="hidden" />
-                  {audioName ? (
+                  {audioFile ? (
                     <div className="flex items-center gap-2 justify-center text-[12px] text-[#b0ada8]">
-                      <div className="flex-1 truncate">{audioName}</div>
-                      <X onClick={(e) => { e.preventDefault(); setAudioData(null); setAudioName(null); }} className="w-4 h-4 hover:text-red-500" />
+                      <div className="flex-1 truncate">{audioFile.name}</div>
+                      <X onClick={(e) => { e.preventDefault(); setAudioFile(null); }} className="w-4 h-4 hover:text-red-500" />
                     </div>
                   ) : (
                     <div className="space-y-1">
@@ -169,9 +174,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               <div className="flex gap-4 pt-4">
                 <button 
                   onClick={handleSubmit}
-                  className="flex-1 bg-[#1a1917] text-white py-3 rounded-sm text-sm font-medium tracking-widest uppercase hover:opacity-80 transition-all"
+                  disabled={isSubmitting}
+                  className="flex-1 bg-[#1a1917] text-white py-3 rounded-sm text-sm font-medium tracking-widest uppercase hover:opacity-80 transition-all disabled:opacity-50"
                 >
-                  Place Stone
+                  {isSubmitting ? 'Placing Stone...' : 'Place Stone'}
                 </button>
                 <button 
                   onClick={onClose}

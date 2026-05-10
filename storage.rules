@@ -1,0 +1,11 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      // Temporary permissive rules to debug upload issues.
+      // In production, you should restrict this to authenticated users
+      // or specific file types.
+      allow read, write: if true;
+    }
+  }
+}

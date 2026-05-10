@@ -223,28 +223,48 @@ export const ConnectDrawer: React.FC<DrawerProps & { onAdd: (entry: Omit<MemoryE
     object: '',
     memory: '',
     type: 'object',
-    image: '',
-    audio: ''
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [audioFile, setAudioFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
     
-    // In a real production app, we would use Firebase Storage for image/audio.
-    // For this prototype, we'll store the textual data and mock the media URL
-    // since the user mentioned linking to Google Forms/Gmail for verification.
-    
-    await onAdd({
-      ...formData,
-      date: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-      verified: false,
-      createdAt: new Date().toISOString() // will be replaced by serverTimestamp in onAdd if we handle it there
-    });
-    
-    setIsSubmitting(false);
-    setStep('success');
+    try {
+      await onAdd({
+        ...formData,
+        imageFile,
+        audioFile,
+        date: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+        verified: false,
+      } as any);
+      setStep('success');
+    } catch (err: any) {
+      console.error("Submission failed:", err);
+      let message = "Something went wrong. Please try again.";
+      try {
+        const parsed = JSON.parse(err.message);
+        if (parsed.error && parsed.error.toLowerCase().includes('insufficient permissions')) {
+          message = "Permission denied. You might need to sign in first.";
+        } else if (parsed.error) {
+          message = parsed.error;
+        }
+      } catch (e) {
+        // Handle common Firebase Storage string errors
+        if (err.message && err.message.includes('storage/unauthorized')) {
+          message = "Storage permission denied. Please ensure the Storage bucket rules allow public uploads.";
+        } else if (err.message) {
+          message = err.message.length > 100 ? err.message.substring(0, 100) + '...' : err.message;
+        }
+      }
+      setError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -331,6 +351,7 @@ export const ConnectDrawer: React.FC<DrawerProps & { onAdd: (entry: Omit<MemoryE
                         <input 
                           type="file"
                           accept="image/*"
+                          onChange={e => setImageFile(e.target.files?.[0] || null)}
                           className="w-full text-[10px] md:text-[11px] text-[#6b6760] file:mr-2 md:file:mr-4 file:py-2 file:px-4 file:rounded-sm file:border-0 file:text-[10px] file:font-semibold file:bg-[#1a1917] file:text-white hover:file:opacity-80 cursor-pointer"
                         />
                       </div>
@@ -340,7 +361,8 @@ export const ConnectDrawer: React.FC<DrawerProps & { onAdd: (entry: Omit<MemoryE
                       <div className="relative">
                         <input 
                           type="file"
-                          accept="audio/mpeg"
+                          accept="audio/*"
+                          onChange={e => setAudioFile(e.target.files?.[0] || null)}
                           className="w-full text-[10px] md:text-[11px] text-[#6b6760] file:mr-2 md:file:mr-4 file:py-2 file:px-4 file:rounded-sm file:border-0 file:text-[10px] file:font-semibold file:bg-[#1a1917] file:text-white hover:file:opacity-80 cursor-pointer"
                         />
                       </div>
@@ -353,21 +375,28 @@ export const ConnectDrawer: React.FC<DrawerProps & { onAdd: (entry: Omit<MemoryE
                     </p>
                   </div>
 
-                  <div className="pt-6 flex gap-4">
-                    <button 
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="flex-1 bg-[#1a1917] text-white py-4 rounded-sm text-[11px] uppercase tracking-[0.2em] hover:opacity-90 disabled:opacity-50 transition-all font-medium"
-                    >
-                      {isSubmitting ? 'Sending Request...' : 'Submit Offering'}
-                    </button>
-                    <button 
-                      type="button"
-                      onClick={() => setStep('info')}
-                      className="px-6 py-4 border border-black/10 text-[#6b6760] rounded-sm text-[11px] uppercase tracking-[0.2em] hover:bg-black/5"
-                    >
-                      Back
-                    </button>
+                  <div className="pt-6 flex flex-col gap-4">
+                    {error && (
+                      <div className="p-3 bg-red-50 border border-red-100 text-red-600 text-[10px] uppercase tracking-widest text-center rounded-sm">
+                        {error}
+                      </div>
+                    )}
+                    <div className="flex gap-4">
+                      <button 
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="flex-1 bg-[#1a1917] text-white py-4 rounded-sm text-[11px] uppercase tracking-[0.2em] hover:opacity-90 disabled:opacity-50 transition-all font-medium"
+                      >
+                        {isSubmitting ? 'Sending Request...' : 'Submit Offering'}
+                      </button>
+                      <button 
+                        type="button"
+                        onClick={() => setStep('info')}
+                        className="px-6 py-4 border border-black/10 text-[#6b6760] rounded-sm text-[11px] uppercase tracking-[0.2em] hover:bg-black/5"
+                      >
+                        Back
+                      </button>
+                    </div>
                   </div>
                 </form>
               )}
