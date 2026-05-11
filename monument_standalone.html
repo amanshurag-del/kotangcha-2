@@ -218,6 +218,41 @@
             prevX = e.clientX; prevY = e.clientY;
         }
     });
+
+    // Touch Support
+    window.addEventListener('touchstart', e => {
+        if (e.touches.length === 1) {
+            e.preventDefault();
+            isDragging = true; prevX = e.touches[0].clientX; prevY = e.touches[0].clientY;
+        }
+    }, {passive: false});
+    window.addEventListener('touchend', () => { isDragging = false; });
+    window.addEventListener('touchmove', e => {
+        if (isDragging && e.touches.length === 1) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            theta -= (touch.clientX / window.innerWidth - prevX / window.innerWidth) * 7;
+            phi = Math.max(0.1, Math.min(1.4, phi + (touch.clientY / window.innerHeight - prevY / window.innerHeight) * 5));
+            prevX = touch.clientX; prevY = touch.clientY;
+            
+            // Interaction on touchmove/tap
+            const mx = (touch.clientX / window.innerWidth) * 2 - 1;
+            const my = -(touch.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera({x: mx, y: my}, camera);
+            const hits = raycaster.intersectObjects(scene.children);
+            const hit = hits.find(h => meshToData.has(h.object));
+            if (hit) {
+                const d = meshToData.get(hit.object);
+                document.getElementById('tip-name').textContent = d.name;
+                document.getElementById('tip-obj').textContent = d.obj;
+                document.getElementById('place').textContent = d.place;
+                tip.style.display = 'block';
+                tip.style.left = touch.clientX + 14 + 'px';
+                tip.style.top = touch.clientY - 40 + 'px';
+            } else { tip.style.display = 'none'; }
+        }
+    }, {passive: true});
+
     window.addEventListener('wheel', e => { radius = Math.max(8, Math.min(30, radius + e.deltaY * 0.02)); }, {passive: false});
 
     const raycaster = new THREE.Raycaster();

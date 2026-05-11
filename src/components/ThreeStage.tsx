@@ -125,11 +125,71 @@ export const ThreeStage: React.FC<ThreeStageProps> = ({ memories }) => {
       autoRotate = false;
     };
 
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 1) {
+        e.preventDefault();
+        isDragging = true;
+        prevMx = e.touches[0].clientX;
+        prevMy = e.touches[0].clientY;
+        autoRotate = false;
+      }
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (!containerRef.current) return;
+      e.preventDefault();
+      const rect = containerRef.current.getBoundingClientRect();
+      
+      if (e.touches.length === 1) {
+        const touch = e.touches[0];
+        const mx = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
+        const my = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
+
+        if (isDragging) {
+          theta -= (touch.clientX - prevMx) * 0.007;
+          phi += (touch.clientY - prevMy) * 0.005;
+          phi = Math.max(0.1, Math.min(1.4, phi));
+          prevMx = touch.clientX;
+          prevMy = touch.clientY;
+        }
+
+        // Raycasting for touch
+        if (monumentRef.current) {
+          raycaster.setFromCamera({ x: mx, y: my } as THREE.Vector2, monumentRef.current.camera);
+          const offeringIntersects = raycaster.intersectObjects(monumentRef.current.offeringMeshes);
+          if (offeringIntersects.length > 0) {
+            const hit = offeringIntersects[0].object as THREE.Mesh;
+            const memory = monumentRef.current.meshToMemory.get(hit);
+            if (memory) {
+              setHoveredMemory(memory);
+              const vector = hit.position.clone();
+              vector.project(monumentRef.current.camera);
+              setMousePos({
+                x: (vector.x * 0.5 + 0.5) * rect.width + rect.left,
+                y: (-(vector.y * 0.5) + 0.5) * rect.height + rect.top
+              });
+            }
+          } else {
+            // Only clear if we're not actively dragging
+            if (!isDragging) setHoveredMemory(null);
+          }
+        }
+      }
+    };
+
+    const onTouchEnd = () => {
+      isDragging = false;
+    };
+
     canvasRef.current.addEventListener('mousedown', onMouseDown);
     window.addEventListener('mouseup', onMouseUp);
     canvasRef.current.addEventListener('mousemove', onMouseMove);
     canvasRef.current.addEventListener('mouseleave', onMouseLeave);
     canvasRef.current.addEventListener('wheel', onWheel, { passive: false });
+    
+    canvasRef.current.addEventListener('touchstart', onTouchStart, { passive: false });
+    canvasRef.current.addEventListener('touchmove', onTouchMove, { passive: false });
+    canvasRef.current.addEventListener('touchend', onTouchEnd);
 
     const animate = () => {
       if (!monumentRef.current) return;
@@ -155,6 +215,9 @@ export const ThreeStage: React.FC<ThreeStageProps> = ({ memories }) => {
       window.removeEventListener('resize', handleResize);
       if (canvasRef.current) {
         canvasRef.current.removeEventListener('mouseleave', onMouseLeave);
+        canvasRef.current.removeEventListener('touchstart', onTouchStart);
+        canvasRef.current.removeEventListener('touchmove', onTouchMove);
+        canvasRef.current.removeEventListener('touchend', onTouchEnd);
       }
       if (monumentRef.current) monumentRef.current.renderer.dispose();
     };

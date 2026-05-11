@@ -158,24 +158,24 @@ export default function App() {
   return (
     <div className="relative min-h-screen">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 w-full h-[50px] z-[100] flex items-center justify-between px-6 md:px-8 bg-[#faf9f7]/95 backdrop-blur-md border-b border-black/5">
-        <div className="flex items-center h-full gap-4 md:gap-8 font-sans font-medium text-[9px] md:text-[10px] tracking-[0.1em] md:tracking-[0.15em] uppercase text-[#b0ada8] whitespace-nowrap">
+      <nav className="fixed top-0 left-0 w-full h-[60px] z-[100] flex items-center justify-between px-4 sm:px-6 md:px-8 bg-[#faf9f7]/95 backdrop-blur-md border-b border-black/5">
+        <div className="flex items-center h-full gap-3 sm:gap-4 md:gap-8 font-sans font-medium text-[10px] md:text-[11px] tracking-[0.1em] md:tracking-[0.15em] uppercase text-[#b0ada8] whitespace-nowrap">
           <div className="flex items-center gap-1.5 h-full">
             <span className="text-[#a36910] font-semibold">{memories.length}</span>
-            <span>MEMORIES</span>
+            <span className="hidden xs:inline">MEMORIES</span>
           </div>
           <button onClick={() => setActiveDrawer('archive')} className="hover:text-[#1a1917] transition-colors cursor-pointer">ARCHIVE</button>
           <button onClick={() => setActiveDrawer('about')} className="hover:text-[#1a1917] transition-colors cursor-pointer hidden sm:block">ABOUT</button>
           <button onClick={() => setActiveDrawer('connect')} className="hover:text-[#1a1917] transition-colors cursor-pointer">OFFER</button>
         </div>
         
-        <div className="absolute left-1/2 -translate-x-1/2 text-center h-[15px] flex items-center justify-center">
-          <a href="#" className="font-serif text-[18px] sm:text-[24px] tracking-tight text-[#1a1917] h-auto w-auto leading-none">
+        <div className="absolute left-1/2 -translate-x-1/2 text-center h-[20px] flex items-center justify-center pointer-events-none">
+          <a href="#" className="font-serif text-[18px] sm:text-[24px] tracking-tight text-[#1a1917] h-auto w-auto leading-none pointer-events-auto">
             <span className="text-[#a36910]">K</span>otangcha
           </a>
         </div>
 
-        <div className="flex items-center justify-end h-full font-sans font-medium text-[9px] md:text-[10px] tracking-[0.1em] md:tracking-[0.15em] uppercase">
+        <div className="flex items-center justify-end h-full font-sans font-medium text-[10px] md:text-[11px] tracking-[0.1em] md:tracking-[0.15em] uppercase">
           {user ? (
             <div className="flex items-center gap-3">
               {isCurator && (
@@ -195,7 +195,7 @@ export default function App() {
         </div>
       </nav>
 
-      <div className="pt-[50px]">
+      <div className="pt-[60px]">
         <ThreeStage memories={memories} />
       </div>
 

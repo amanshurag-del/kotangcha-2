@@ -47,7 +47,7 @@ export const ArchiveDrawer: React.FC<DrawerProps & {
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className="fixed top-0 right-0 bottom-0 w-full md:w-[600px] lg:w-[700px] bg-[#faf9f7] border-l border-black/10 z-[200] overflow-y-auto shadow-2xl"
           >
-            <div className="p-10 md:p-16">
+            <div className="p-6 sm:p-10 md:p-16">
               <div className="flex justify-between items-start mb-8 gap-4">
                 <div>
                   <h2 className="font-sans font-medium text-2xl md:text-3xl text-[#1a1917] tracking-tight">The Archive</h2>
@@ -188,7 +188,7 @@ export const AboutDrawer: React.FC<DrawerProps> = ({ isOpen, onClose }) => (
           transition={{ type: 'spring', damping: 25, stiffness: 200 }}
           className="fixed top-0 right-0 bottom-0 w-full md:w-[600px] bg-[#faf9f7] border-l border-black/10 z-[200] overflow-y-auto shadow-2xl"
         >
-          <div className="p-10 md:p-16 max-w-[600px] mx-auto">
+          <div className="p-6 sm:p-10 md:p-16 max-w-[600px] mx-auto">
             <div className="flex justify-between items-start mb-12">
               <h2 className="font-sans font-medium text-3xl text-[#1a1917] tracking-tight uppercase tracking-[0.1em]">About</h2>
               <button onClick={onClose} className="p-2 hover:bg-black/5 rounded-full transition-colors"><X className="w-5 h-5 text-[#6b6760]" /></button>
@@ -277,7 +277,7 @@ export const ConnectDrawer: React.FC<DrawerProps & { onAdd: (entry: Omit<MemoryE
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className="fixed top-0 right-0 bottom-0 w-full md:w-[600px] bg-[#faf9f7] border-l border-black/10 z-[200] overflow-y-auto shadow-2xl"
           >
-            <div className="p-10 md:p-16 md:max-w-[640px] mx-auto">
+            <div className="p-6 sm:p-10 md:p-16 md:max-w-[640px] mx-auto">
               <div className="flex justify-between items-start mb-12">
                 <h2 className="font-sans font-medium text-3xl text-[#1a1917] tracking-tight uppercase tracking-[0.1em]">Offer</h2>
                 <button onClick={onClose} className="p-2 hover:bg-black/5 rounded-full transition-colors"><X className="w-5 h-5 text-[#6b6760]" /></button>
