@@ -202,7 +202,7 @@ export const AboutDrawer: React.FC<DrawerProps> = ({ isOpen, onClose }) => (
                 This archive reimagines the kotangcha as a living, participatory structure — one that looks not only toward the past, but also toward the future. Each offering becomes a stone. Each stone carries a whisper. Together, they form something new.
               </p>
               <p className="text-sm text-[#6b6760] leading-relaxed">
-                This project explores memory-making, collective memory, and landscape as a site of lived experience.
+                This project explores memory-making, collective memory, and the relationship between people, ritual, and land.
               </p>
               <div className="pt-8 font-sans font-normal text-[17px] text-[#7a5c3a]">
                 — Aman Negi
