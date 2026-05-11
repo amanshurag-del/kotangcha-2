@@ -24,6 +24,9 @@ export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth(app);
 export const storage = getStorage(app);
 export const googleProvider = new GoogleAuthProvider();
+googleProvider.addScope('email');
+googleProvider.addScope('profile');
+googleProvider.setCustomParameters({ prompt: 'select_account' });
 
 export async function uploadFile(file: File, path: string): Promise<string> {
   const fileRef = ref(storage, `${path}/${Date.now()}_${file.name}`);

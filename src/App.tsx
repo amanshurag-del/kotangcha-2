@@ -125,8 +125,19 @@ export default function App() {
     try {
       await signInWithPopup(auth, googleProvider);
       setShowLogin(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Login failed:', err);
+      // More descriptive error for users
+      if (err.code === 'auth/popup-blocked') {
+        alert('The login popup was blocked by your browser. Please enable popups and try again.');
+      } else if (err.code === 'auth/cancelled-popup-request' || err.code === 'auth/popup-closed-by-user') {
+        // Silently ignore as the user intentionally closed it or cancelled it
+        console.log('Login cancelled or closed by user');
+      } else if (err.code === 'auth/internal-error' || err.code === 'auth/network-request-failed') {
+        alert('A network error occurred. Please check your internet connection and try again.');
+      } else {
+        alert(`Authentication error: ${err.message || 'Please try again later.'}\n\nTip: On mobile, ensure that you don't close the sign-in window before authentication completes.`);
+      }
     }
   };
 
@@ -178,10 +189,14 @@ export default function App() {
         <div className="flex items-center justify-end h-full font-sans font-medium text-[10px] md:text-[11px] tracking-[0.1em] md:tracking-[0.15em] uppercase">
           {user ? (
             <div className="flex items-center gap-3">
-              {isCurator && (
+              {isCurator ? (
                 <button onClick={() => setIsAdminOpen(true)} className="text-[#a36910] hover:opacity-80 transition-opacity cursor-pointer">
                   CURATOR
                 </button>
+              ) : (
+                <span className="text-[#b0ada8] cursor-default border border-black/5 px-2 py-1 rounded-sm bg-black/5">
+                  ARTIST
+                </span>
               )}
               <button onClick={logout} className="text-[#b0ada8] hover:text-[#1a1917] transition-colors cursor-pointer">
                 LOGOUT
@@ -229,6 +244,8 @@ export default function App() {
       <ConnectDrawer 
         isOpen={activeDrawer === 'connect'} 
         onClose={() => setActiveDrawer(null)} 
+        user={user}
+        onLogin={() => setShowLogin(true)}
         onAdd={addMemory}
       />
 
@@ -252,6 +269,10 @@ export default function App() {
               >
                 Sign in with Google
               </button>
+              
+              <p className="mt-4 text-[10px] text-[#b0ada8] italic leading-tight">
+                Mobile Tip: Ensure popups are allowed and keep the sign-in window open until finished.
+              </p>
               
               <button 
                 onClick={() => setShowLogin(false)}

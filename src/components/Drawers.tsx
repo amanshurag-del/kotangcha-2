@@ -215,7 +215,11 @@ export const AboutDrawer: React.FC<DrawerProps> = ({ isOpen, onClose }) => (
   </AnimatePresence>
 );
 
-export const ConnectDrawer: React.FC<DrawerProps & { onAdd: (entry: Omit<MemoryEntry, 'id'>) => Promise<void> }> = ({ isOpen, onClose, onAdd }) => {
+export const ConnectDrawer: React.FC<DrawerProps & { 
+  user: any,
+  onLogin: () => void,
+  onAdd: (entry: Omit<MemoryEntry, 'id'>) => Promise<void> 
+}> = ({ isOpen, onClose, user, onLogin, onAdd }) => {
   const [step, setStep] = useState<'info' | 'form' | 'success'>('info');
   const [formData, setFormData] = useState({
     name: '',
@@ -289,12 +293,23 @@ export const ConnectDrawer: React.FC<DrawerProps & { onAdd: (entry: Omit<MemoryE
                   <p className="text-sm text-[#6b6760] leading-relaxed max-w-[400px] mx-auto">
                     Share a memory, an object, or a fragment of your history. Your offering will be verified and then placed on the kotangcha.
                   </p>
-                  <button 
-                    onClick={() => setStep('form')}
-                    className="w-full sm:w-auto inline-block px-10 py-4 bg-[#1a1917] text-white font-sans text-[11px] tracking-[0.2em] uppercase rounded-sm hover:opacity-80 transition-all font-medium"
-                  >
-                    Make an Offering
-                  </button>
+                  
+                  <div className="flex flex-col gap-4 items-center">
+                    {!user && (
+                      <button 
+                        onClick={onLogin}
+                        className="w-full sm:w-auto inline-block px-10 py-4 border border-[#1a1917] text-[#1a1917] font-sans text-[11px] tracking-[0.2em] uppercase rounded-sm hover:bg-[#1a1917] hover:text-white transition-all font-medium"
+                      >
+                        Artist Sign In ↗
+                      </button>
+                    )}
+                    <button 
+                      onClick={() => setStep('form')}
+                      className="w-full sm:w-auto inline-block px-10 py-4 bg-[#1a1917] text-white font-sans text-[11px] tracking-[0.2em] uppercase rounded-sm hover:opacity-80 transition-all font-medium"
+                    >
+                      Make an Offering
+                    </button>
+                  </div>
                 </div>
               )}
 
