@@ -45,7 +45,7 @@ export const ArchiveDrawer: React.FC<DrawerProps & {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 bottom-0 w-full md:w-[600px] lg:w-[700px] bg-[#faf9f7] border-l border-black/10 z-[200] overflow-y-auto shadow-2xl"
+            className="fixed top-0 right-0 bottom-0 w-full md:w-[600px] lg:w-[700px] bg-[#faf9f7] border-l border-black/10 z-[200] overflow-y-auto shadow-2xl pt-[60px]"
           >
             <div className="p-6 sm:p-10 md:p-16">
               <div className="flex justify-between items-start mb-8 gap-4">
@@ -186,7 +186,7 @@ export const AboutDrawer: React.FC<DrawerProps> = ({ isOpen, onClose }) => (
         <motion.div 
           initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
           transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-          className="fixed top-0 right-0 bottom-0 w-full md:w-[600px] bg-[#faf9f7] border-l border-black/10 z-[200] overflow-y-auto shadow-2xl"
+          className="fixed top-0 right-0 bottom-0 w-full md:w-[600px] bg-[#faf9f7] border-l border-black/10 z-[200] overflow-y-auto shadow-2xl pt-[60px]"
         >
           <div className="p-6 sm:p-10 md:p-16 max-w-[600px] mx-auto">
             <div className="flex justify-between items-start mb-12">
@@ -204,7 +204,7 @@ export const AboutDrawer: React.FC<DrawerProps> = ({ isOpen, onClose }) => (
               <p className="text-sm text-[#6b6760] leading-relaxed">
                 This project explores memory-making, collective memory, and landscape as a site of lived experience.
               </p>
-              <div className="pt-8 font-serif italic text-lg text-[#7a5c3a]">
+              <div className="pt-8 font-sans font-normal text-[17px] text-[#7a5c3a]">
                 — Aman Negi
               </div>
             </div>
@@ -279,7 +279,7 @@ export const ConnectDrawer: React.FC<DrawerProps & {
           <motion.div 
             initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 bottom-0 w-full md:w-[600px] bg-[#faf9f7] border-l border-black/10 z-[200] overflow-y-auto shadow-2xl"
+            className="fixed top-0 right-0 bottom-0 w-full md:w-[600px] bg-[#faf9f7] border-l border-black/10 z-[200] overflow-y-auto shadow-2xl pt-[60px]"
           >
             <div className="p-6 sm:p-10 md:p-16 md:max-w-[640px] mx-auto">
               <div className="flex justify-between items-start mb-12">
@@ -288,28 +288,47 @@ export const ConnectDrawer: React.FC<DrawerProps & {
               </div>
 
               {step === 'info' && (
-                <div className="text-center space-y-8 py-12 px-4 md:px-0">
-                  <div className="text-4xl opacity-40">✦</div>
-                  <p className="text-sm text-[#6b6760] leading-relaxed max-w-[400px] mx-auto">
-                    Share a memory, an object, or a fragment of your history. Your offering will be verified and then placed on the kotangcha.
-                  </p>
-                  
-                  <div className="flex flex-col gap-4 items-center">
-                    {!user && (
+                <div className="flex flex-col h-[calc(100vh-250px)] justify-between py-12 px-4 md:px-0">
+                  <div className="text-center space-y-8">
+                    <div className="w-[32px] h-[36px] mx-auto opacity-60 flex items-center justify-center">
+                      <svg viewBox="0 0 100 140" className="w-full h-full fill-[#6b6760]">
+                        {/* Ornament U-shape */}
+                        <path d="M32 5h8v15h20V5h8v22H32V5z" />
+                        <rect x="46" y="27" width="8" height="8" />
+                        {/* Tier 1 (Top Narrow) */}
+                        <rect x="28" y="35" width="44" height="25" />
+                        {/* Tier 2 (Middle Wide) */}
+                        <rect x="8" y="60" width="84" height="25" />
+                        {/* Tier 3 (Bottom Narrow) */}
+                        <rect x="28" y="85" width="44" height="25" />
+                        {/* Tier 4 (Base Wide) */}
+                        <rect x="8" y="110" width="84" height="30" />
+                      </svg>
+                    </div>
+                    <p className="text-[13px] text-[#6b6760] leading-relaxed max-w-[360px] mx-auto font-sans">
+                      Share a memory, an object, or a fragment of your history. Your offering will be verified and then placed on the kotangcha.
+                    </p>
+                    
+                    <div className="flex flex-col gap-4 items-center pt-4">
+                      <button 
+                        onClick={() => setStep('form')}
+                        className="w-full sm:w-auto inline-block px-12 py-4 bg-[#1a1917] text-white font-sans text-[10px] tracking-[0.2em] uppercase rounded-sm hover:opacity-90 transition-all font-medium"
+                      >
+                        Make an Offering
+                      </button>
+                    </div>
+                  </div>
+
+                  {!user && (
+                    <div className="flex justify-center pt-12">
                       <button 
                         onClick={onLogin}
-                        className="w-full sm:w-auto inline-block px-10 py-4 border border-[#1a1917] text-[#1a1917] font-sans text-[11px] tracking-[0.2em] uppercase rounded-sm hover:bg-[#1a1917] hover:text-white transition-all font-medium"
+                        className="px-10 py-3.5 border border-black/10 text-[#6b6760] font-sans text-[9px] tracking-[0.25em] uppercase rounded-sm hover:bg-black/5 transition-all"
                       >
                         Artist Sign In ↗
                       </button>
-                    )}
-                    <button 
-                      onClick={() => setStep('form')}
-                      className="w-full sm:w-auto inline-block px-10 py-4 bg-[#1a1917] text-white font-sans text-[11px] tracking-[0.2em] uppercase rounded-sm hover:opacity-80 transition-all font-medium"
-                    >
-                      Make an Offering
-                    </button>
-                  </div>
+                    </div>
+                  )}
                 </div>
               )}
 

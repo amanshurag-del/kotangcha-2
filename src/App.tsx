@@ -133,6 +133,8 @@ export default function App() {
       } else if (err.code === 'auth/cancelled-popup-request' || err.code === 'auth/popup-closed-by-user') {
         // Silently ignore as the user intentionally closed it or cancelled it
         console.log('Login cancelled or closed by user');
+      } else if (err.code === 'auth/unauthorized-domain') {
+        alert('Unauthorized Domain: This domain is not whitelisted in the Firebase console. Please add ' + window.location.hostname + ' to your Firebase Authorized Domains.');
       } else if (err.code === 'auth/internal-error' || err.code === 'auth/network-request-failed') {
         alert('A network error occurred. Please check your internet connection and try again.');
       } else {
@@ -169,15 +171,14 @@ export default function App() {
   return (
     <div className="relative min-h-screen">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 w-full h-[60px] z-[100] flex items-center justify-between px-4 sm:px-6 md:px-8 bg-[#faf9f7]/95 backdrop-blur-md border-b border-black/5">
+      <nav className="fixed top-0 left-0 w-full h-[60px] z-[250] flex items-center justify-between px-4 sm:px-6 md:px-8 bg-[#faf9f7]/95 backdrop-blur-md border-b border-black/5">
         <div className="flex items-center h-full gap-3 sm:gap-4 md:gap-8 font-sans font-medium text-[10px] md:text-[11px] tracking-[0.1em] md:tracking-[0.15em] uppercase text-[#b0ada8] whitespace-nowrap">
           <div className="flex items-center gap-1.5 h-full">
             <span className="text-[#a36910] font-semibold">{memories.length}</span>
             <span className="hidden xs:inline">MEMORIES</span>
           </div>
           <button onClick={() => setActiveDrawer('archive')} className="hover:text-[#1a1917] transition-colors cursor-pointer">ARCHIVE</button>
-          <button onClick={() => setActiveDrawer('about')} className="hover:text-[#1a1917] transition-colors cursor-pointer hidden sm:block">ABOUT</button>
-          <button onClick={() => setActiveDrawer('connect')} className="hover:text-[#1a1917] transition-colors cursor-pointer">OFFER</button>
+          <button onClick={() => setActiveDrawer('about')} className="hover:text-[#1a1917] transition-colors cursor-pointer">ABOUT</button>
         </div>
         
         <div className="absolute left-1/2 -translate-x-1/2 text-center h-[20px] flex items-center justify-center pointer-events-none">
@@ -198,13 +199,19 @@ export default function App() {
                   ARTIST
                 </span>
               )}
+              <button 
+                onClick={() => setActiveDrawer('connect')} 
+                className="text-[#b0ada8] hover:text-[#7a5c3a] transition-colors flex items-center gap-1 cursor-pointer ml-2"
+              >
+                OFFER <span className="text-[11px] md:text-[12px] leading-none mb-0.5">↗</span>
+              </button>
               <button onClick={logout} className="text-[#b0ada8] hover:text-[#1a1917] transition-colors cursor-pointer">
                 LOGOUT
               </button>
             </div>
           ) : (
-            <button onClick={() => setShowLogin(true)} className="text-[#b0ada8] hover:text-[#7a5c3a] transition-colors flex items-center gap-1 cursor-pointer">
-              <span className="hidden sm:inline">ARTIST</span> <span className="text-[11px] md:text-[12px] leading-none mb-0.5">↗</span>
+            <button onClick={() => setActiveDrawer('connect')} className="text-[#b0ada8] hover:text-[#7a5c3a] transition-colors flex items-center gap-1 cursor-pointer">
+              <span className="hidden sm:inline">OFFER</span> <span className="text-[11px] md:text-[12px] leading-none mb-0.5">↗</span>
             </button>
           )}
         </div>
