@@ -25,8 +25,10 @@ export class MonumentScene {
       antialias: true,
       alpha: true,
       powerPreference: 'high-performance',
+      precision: 'highp',
     });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3));
+    this.renderer.setSize(width, height);
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.setClearColor(0xfaf9f7, 0);
