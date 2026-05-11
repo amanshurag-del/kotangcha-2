@@ -220,15 +220,27 @@
     });
 
     // Touch Support
+    let initialPinchDist = 0;
+    let initialRadius = radius;
+
     window.addEventListener('touchstart', e => {
         if (e.touches.length === 1) {
             e.preventDefault();
             isDragging = true; prevX = e.touches[0].clientX; prevY = e.touches[0].clientY;
+            autoRotate = false;
+        } else if (e.touches.length === 2) {
+            e.preventDefault();
+            isDragging = false;
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            initialPinchDist = Math.sqrt(dx * dx + dy * dy);
+            initialRadius = radius;
+            autoRotate = false;
         }
     }, {passive: false});
     window.addEventListener('touchend', () => { isDragging = false; });
     window.addEventListener('touchmove', e => {
-        if (isDragging && e.touches.length === 1) {
+        if (e.touches.length === 1 && isDragging) {
             e.preventDefault();
             const touch = e.touches[0];
             theta -= (touch.clientX / window.innerWidth - prevX / window.innerWidth) * 7;
@@ -250,8 +262,15 @@
                 tip.style.left = touch.clientX + 14 + 'px';
                 tip.style.top = touch.clientY - 40 + 'px';
             } else { tip.style.display = 'none'; }
+        } else if (e.touches.length === 2) {
+            e.preventDefault();
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const diff = dist - initialPinchDist;
+            radius = Math.max(8, Math.min(30, initialRadius - diff * 0.05));
         }
-    }, {passive: true});
+    }, {passive: false});
 
     window.addEventListener('wheel', e => { radius = Math.max(8, Math.min(30, radius + e.deltaY * 0.02)); }, {passive: false});
 

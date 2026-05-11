@@ -125,14 +125,29 @@ export const ThreeStage: React.FC<ThreeStageProps> = ({ memories }) => {
       autoRotate = false;
     };
 
+    let initialPinchDistance = 0;
+    let initialRadius = 0;
+
     const onTouchStart = (e: TouchEvent) => {
+      autoRotate = false;
       if (e.touches.length === 1) {
-        e.preventDefault();
+        // e.preventDefault(); // Handled by passive: false listener but explicit call is safer
         isDragging = true;
         prevMx = e.touches[0].clientX;
         prevMy = e.touches[0].clientY;
-        autoRotate = false;
+      } else if (e.touches.length === 2) {
+        isDragging = false; // Stop rotation during pinch
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        initialPinchDistance = Math.sqrt(dx * dx + dy * dy);
+        initialRadius = radius;
       }
+    };
+
+    const getDistance = (touches: TouchList) => {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
     };
 
     const onTouchMove = (e: TouchEvent) => {
@@ -142,19 +157,20 @@ export const ThreeStage: React.FC<ThreeStageProps> = ({ memories }) => {
       
       if (e.touches.length === 1) {
         const touch = e.touches[0];
-        const mx = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
-        const my = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
-
+        
         if (isDragging) {
           theta -= (touch.clientX - prevMx) * 0.007;
           phi += (touch.clientY - prevMy) * 0.005;
           phi = Math.max(0.1, Math.min(1.4, phi));
-          prevMx = touch.clientX;
-          prevMy = touch.clientY;
         }
+        
+        prevMx = touch.clientX;
+        prevMy = touch.clientY;
 
         // Raycasting for touch
         if (monumentRef.current) {
+          const mx = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
+          const my = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
           raycaster.setFromCamera({ x: mx, y: my } as THREE.Vector2, monumentRef.current.camera);
           const offeringIntersects = raycaster.intersectObjects(monumentRef.current.offeringMeshes);
           if (offeringIntersects.length > 0) {
@@ -174,6 +190,11 @@ export const ThreeStage: React.FC<ThreeStageProps> = ({ memories }) => {
             if (!isDragging) setHoveredMemory(null);
           }
         }
+      } else if (e.touches.length === 2) {
+        const currentDistance = getDistance(e.touches);
+        const diff = currentDistance - initialPinchDistance;
+        // Sensitivity for pinch zoom
+        radius = Math.max(8, Math.min(30, initialRadius - diff * 0.05));
       }
     };
 
