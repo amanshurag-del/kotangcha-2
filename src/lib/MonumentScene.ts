@@ -24,8 +24,9 @@ export class MonumentScene {
       canvas,
       antialias: true,
       alpha: true,
+      powerPreference: 'high-performance',
     });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3));
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.setClearColor(0xfaf9f7, 0);
@@ -39,7 +40,7 @@ export class MonumentScene {
     const sun = new THREE.DirectionalLight(0xfffdfa, 0.6);
     sun.position.set(10, 20, 10);
     sun.castShadow = true;
-    sun.shadow.mapSize.width = sun.shadow.mapSize.height = 2048;
+    sun.shadow.mapSize.width = sun.shadow.mapSize.height = 4096;
     sun.shadow.camera.left = sun.shadow.camera.bottom = -10;
     sun.shadow.camera.right = sun.shadow.camera.top = 10;
     this.scene.add(sun);
@@ -236,10 +237,10 @@ export class MonumentScene {
   }
 
   private stoneTex(seed: number, bH: number, bS: number, bL: number) {
-    const sz = 256;
+    const sz = 1024;
     const cv = document.createElement('canvas');
     cv.width = cv.height = sz;
-    const ctx = cv.getContext('2d')!;
+    const ctx = cv.getContext('2d', { alpha: false })!;
     const rng = (s: number) => {
       let x = Math.sin(s + 1) * 10000;
       return x - Math.floor(x);
@@ -248,29 +249,30 @@ export class MonumentScene {
     ctx.fillRect(0, 0, sz, sz);
     let y = 0, row = 0;
     while (y < sz) {
-      const rh = 18 + rng(seed + row) * 10;
+      const rh = (18 + rng(seed + row) * 10) * 4;
       ctx.fillStyle = `hsl(${bH},${Math.max(0, bS - 15)}%,${Math.max(20, bL - 18)}%)`;
-      ctx.fillRect(0, y, sz, 2);
-      let x = rng(seed + row * 100) * 20;
+      ctx.fillRect(0, y, sz, 4);
+      let x = rng(seed + row * 100) * 80;
       let col = 0;
       while (x < sz) {
-        const sw = 28 + rng(seed + row * 100 + col) * 28;
+        const sw = (28 + rng(seed + row * 100 + col) * 28) * 4;
         ctx.fillStyle = `hsl(${bH},${Math.max(0, bS - 12)}%,${Math.max(20, bL - 14)}%)`;
-        ctx.fillRect(x, y + 2, 1.5, rh - 2);
+        ctx.fillRect(x, y + 4, 3, rh - 4);
         const l2 = bL + (rng(seed + row + col + 1) - 0.5) * 16;
         ctx.fillStyle = `hsl(${bH + rng(seed + row + col) * 8 - 4},${bS}%,${l2}%)`;
-        ctx.fillRect(x + 1.5, y + 2, sw - 1.5, rh - 2);
+        ctx.fillRect(x + 3, y + 4, sw - 3, rh - 4);
         x += sw; col++;
       }
       y += rh; row++;
     }
     const t = new THREE.CanvasTexture(cv);
     t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
     return t;
   }
 
   private prayerFlagTex() {
-    const w = 128, h = 640;
+    const w = 512, h = 2560;
     const cv = document.createElement('canvas');
     cv.width = w; cv.height = h;
     const ctx = cv.getContext('2d')!;
@@ -280,15 +282,15 @@ export class MonumentScene {
     for (let i = 0; i < 5; i++) {
       const yOff = i * segH;
       ctx.strokeStyle = 'rgba(0,0,0,0.04)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(4, yOff + 4, w - 8, segH - 8);
+      ctx.lineWidth = 4;
+      ctx.strokeRect(16, yOff + 16, w - 32, segH - 32);
       ctx.fillStyle = 'rgba(0,0,0,0.12)';
       const cx = w/2, cy = yOff + segH/2;
-      ctx.fillRect(cx - 1, cy - 10, 2, 20);
-      ctx.fillRect(cx - 10, cy - 1, 20, 2);
+      ctx.fillRect(cx - 2, cy - 40, 4, 80);
+      ctx.fillRect(cx - 40, cy - 2, 80, 4);
     }
     const t = new THREE.CanvasTexture(cv);
-    t.anisotropy = 4;
+    t.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
     return t;
   }
 }

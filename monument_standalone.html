@@ -44,9 +44,9 @@
 (function(){
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     document.body.appendChild(renderer.domElement);
@@ -58,7 +58,7 @@
     const sun = new THREE.DirectionalLight(0xfffdfa, 0.6);
     sun.position.set(10, 20, 10);
     sun.castShadow = true;
-    sun.shadow.mapSize.width = sun.shadow.mapSize.height = 2048;
+    sun.shadow.mapSize.width = sun.shadow.mapSize.height = 4096;
     scene.add(sun);
     
     const rim = new THREE.DirectionalLight(0xffffff, 0.2);
@@ -67,47 +67,48 @@
 
     // Procedural Textures
     function stoneTex(seed, bH, bS, bL) {
-        const sz = 256; const cv = document.createElement('canvas');
-        cv.width = cv.height = sz; const ctx = cv.getContext('2d');
+        const sz = 1024; const cv = document.createElement('canvas');
+        cv.width = cv.height = sz; const ctx = cv.getContext('2d', { alpha: false });
         const rng = s => { let x = Math.sin(s + 1) * 10000; return x - Math.floor(x); };
         ctx.fillStyle = `hsl(${bH},${bS}%,${bL}%)`; ctx.fillRect(0,0,sz,sz);
         let y = 0, row = 0;
         while (y < sz) {
-            const rh = 18 + rng(seed + row) * 10;
+            const rh = (18 + rng(seed + row) * 10) * 4;
             ctx.fillStyle = `hsl(${bH},${Math.max(0,bS-15)}%,${Math.max(20,bL-18)}%)`;
-            ctx.fillRect(0, y, sz, 2);
-            let x = rng(seed + row * 100) * 20, col = 0;
+            ctx.fillRect(0, y, sz, 4);
+            let x = rng(seed + row * 100) * 80, col = 0;
             while (x < sz) {
-                const sw = 28 + rng(seed + row * 100 + col) * 28;
+                const sw = (28 + rng(seed + row * 100 + col) * 28) * 4;
                 ctx.fillStyle = `hsl(${bH},${Math.max(0,bS-12)}%,${Math.max(20,bL-14)}%)`;
-                ctx.fillRect(x, y+2, 1.5, rh-2);
+                ctx.fillRect(x, y+4, 3, rh-4);
                 const l2 = bL + (rng(seed + row + col + 1) - 0.5) * 16;
                 ctx.fillStyle = `hsl(${bH + rng(seed+row+col)*8-4},${bS}%,${l2}%)`;
-                ctx.fillRect(x+1.5, y+2, sw-1.5, rh-2);
+                ctx.fillRect(x+3, y+4, sw-3, rh-4);
                 x += sw; col++;
             }
             y += rh; row++;
         }
-        for (let i = 0; i < 2000; i++) {
-            ctx.fillStyle = `rgba(0,0,0,${rng(seed*(i+1)+3)*0.08})`;
-            ctx.fillRect(rng(seed*(i+1)+1)*sz, rng(seed*(i+1)+2)*sz, rng(seed*(i+1)+4)*3+1, 1);
-        }
-        const t = new THREE.CanvasTexture(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t;
+        const t = new THREE.CanvasTexture(cv); 
+        t.wrapS = t.wrapT = THREE.RepeatWrapping;
+        t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+        return t;
     }
 
     function prayerFlagTex() {
-        const w = 128, h = 640; const cv = document.createElement('canvas');
+        const w = 512, h = 2560; const cv = document.createElement('canvas');
         cv.width = w; cv.height = h; const ctx = cv.getContext('2d');
         ctx.fillStyle = '#f5f2eb'; ctx.fillRect(0, 0, w, h);
         const segH = h / 5;
         for (let i = 0; i < 5; i++) {
             const yOff = i * segH;
-            ctx.strokeStyle = 'rgba(0,0,0,0.03)'; ctx.lineWidth = 1;
-            ctx.strokeRect(2, yOff + 2, w - 4, segH - 4);
+            ctx.strokeStyle = 'rgba(0,0,0,0.03)'; ctx.lineWidth = 4;
+            ctx.strokeRect(16, yOff + 16, w - 32, segH - 32);
             ctx.fillStyle = 'rgba(0,0,0,0.1)'; const cx = w/2, cy = yOff + segH/2;
-            ctx.fillRect(cx - 1, cy - 8, 2, 16); ctx.fillRect(cx - 8, cy - 1, 16, 2);
+            ctx.fillRect(cx - 2, cy - 40, 4, 80); ctx.fillRect(cx - 40, cy - 2, 80, 4);
         }
-        const t = new THREE.CanvasTexture(cv); t.anisotropy = 4; return t;
+        const t = new THREE.CanvasTexture(cv); 
+        t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+        return t;
     }
 
     const st1 = stoneTex(42, 42, 22, 62); st1.repeat.set(2,2);
