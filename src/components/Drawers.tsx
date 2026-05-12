@@ -50,7 +50,7 @@ export const ArchiveDrawer: React.FC<DrawerProps & {
             <div className="p-6 sm:p-10 md:p-16">
               <div className="flex justify-between items-start mb-8 gap-4">
                 <div>
-                  <h2 className="font-sans font-medium text-2xl md:text-3xl text-[#1a1917] tracking-tight">The Archive</h2>
+                  <h2 className="font-sans font-bold text-2xl md:text-3xl text-[#1a1917] tracking-tight">The Archive</h2>
                   <p className="text-[10px] md:text-[11px] text-[#b0ada8] tracking-widest uppercase mt-1">All memories offered to the kotangcha</p>
                 </div>
                 <button onClick={onClose} className="p-2 hover:bg-black/5 rounded-full transition-colors">
@@ -190,7 +190,7 @@ export const AboutDrawer: React.FC<DrawerProps> = ({ isOpen, onClose }) => (
         >
           <div className="p-6 sm:p-10 md:p-16 max-w-[600px] mx-auto">
             <div className="flex justify-between items-start mb-12">
-              <h2 className="font-sans font-medium text-3xl text-[#1a1917] tracking-tight uppercase tracking-[0.1em]">About</h2>
+              <h2 className="font-sans font-bold text-3xl text-[#1a1917] tracking-tight uppercase tracking-[0.1em]">About</h2>
               <button onClick={onClose} className="p-2 hover:bg-black/5 rounded-full transition-colors"><X className="w-5 h-5 text-[#6b6760]" /></button>
             </div>
             <div className="space-y-6">
@@ -280,7 +280,7 @@ export const ConnectDrawer: React.FC<DrawerProps & {
           >
             <div className="p-6 sm:p-10 md:p-16 md:max-w-[640px] mx-auto">
               <div className="flex justify-between items-start mb-12">
-                <h2 className="font-sans font-medium text-3xl text-[#1a1917] tracking-tight uppercase tracking-[0.1em]">Offer</h2>
+                <h2 className="font-sans font-bold text-3xl text-[#1a1917] tracking-tight uppercase tracking-[0.1em]">Offer</h2>
                 <button onClick={onClose} className="p-2 hover:bg-black/5 rounded-full transition-colors"><X className="w-5 h-5 text-[#6b6760]" /></button>
               </div>
 

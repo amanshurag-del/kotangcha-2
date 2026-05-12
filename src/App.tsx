@@ -174,15 +174,15 @@ export default function App() {
       <nav className="fixed top-0 left-0 w-full h-[60px] z-[250] flex items-center justify-between px-4 sm:px-6 md:px-8 bg-[#faf9f7]/95 backdrop-blur-md border-b border-black/5">
         <div className="flex items-center h-full gap-3 sm:gap-4 md:gap-8 font-sans font-medium text-[10px] md:text-[11px] tracking-[0.1em] md:tracking-[0.15em] uppercase text-[#b0ada8] whitespace-nowrap">
           <div className="flex items-center gap-1.5 h-full">
-            <span className="text-[#a36910] font-semibold">{memories.length}</span>
+            <span className="text-[#a36910] font-normal">{memories.length}</span>
             <span className="hidden xs:inline">MEMORIES</span>
           </div>
-          <button onClick={() => setActiveDrawer('archive')} className="hover:text-[#1a1917] transition-colors cursor-pointer">ARCHIVE</button>
-          <button onClick={() => setActiveDrawer('about')} className="hover:text-[#1a1917] transition-colors cursor-pointer">ABOUT</button>
+          <button onClick={() => setActiveDrawer('archive')} className="hover:text-[#1a1917] transition-colors cursor-pointer font-bold">ARCHIVE</button>
+          <button onClick={() => setActiveDrawer('about')} className="hover:text-[#1a1917] transition-colors cursor-pointer font-bold">ABOUT</button>
         </div>
         
         <div className="absolute left-1/2 -translate-x-1/2 text-center h-[20px] flex items-center justify-center pointer-events-none">
-          <a href="#" className="font-serif text-[18px] sm:text-[24px] tracking-tight text-[#1a1917] h-auto w-auto leading-none pointer-events-auto">
+          <a href="#" className="font-serif font-bold text-[18px] sm:text-[24px] tracking-tight text-[#1a1917] h-auto w-auto leading-none pointer-events-auto">
             <span className="text-[#a36910]">K</span>otangcha
           </a>
         </div>
@@ -201,17 +201,17 @@ export default function App() {
               )}
               <button 
                 onClick={() => setActiveDrawer('connect')} 
-                className="text-[#b0ada8] hover:text-[#7a5c3a] transition-colors flex items-center gap-1 cursor-pointer ml-2"
+                className="text-[#b0ada8] hover:text-[#7a5c3a] transition-colors flex items-center gap-1 cursor-pointer ml-2 font-bold"
               >
-                OFFER <span className="text-[11px] md:text-[12px] leading-none mb-0.5">↗</span>
+                OFFER <span className="text-[11px] md:text-[12px] leading-none mb-0.5 text-[#a36910] font-bold">↗</span>
               </button>
               <button onClick={logout} className="text-[#b0ada8] hover:text-[#1a1917] transition-colors cursor-pointer">
                 LOGOUT
               </button>
             </div>
           ) : (
-            <button onClick={() => setActiveDrawer('connect')} className="text-[#b0ada8] hover:text-[#7a5c3a] transition-colors flex items-center gap-1 cursor-pointer">
-              <span className="hidden sm:inline">OFFER</span> <span className="text-[11px] md:text-[12px] leading-none mb-0.5">↗</span>
+            <button onClick={() => setActiveDrawer('connect')} className="text-[#b0ada8] hover:text-[#7a5c3a] transition-colors flex items-center gap-1 cursor-pointer font-bold">
+              <span className="hidden sm:inline">OFFER</span> <span className="text-[11px] md:text-[12px] leading-none mb-0.5 text-[#a36910] font-bold">↗</span>
             </button>
           )}
         </div>
