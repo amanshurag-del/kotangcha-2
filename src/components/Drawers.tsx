@@ -204,9 +204,6 @@ export const AboutDrawer: React.FC<DrawerProps> = ({ isOpen, onClose }) => (
               <p className="text-sm text-[#6b6760] leading-relaxed">
                 This project explores memory-making, collective memory, and how memory is carried through landscape, ritual, objects, and collective participation.
               </p>
-              <div className="pt-8 font-sans font-normal text-[17px] text-[#7a5c3a]">
-                — Aman Negi
-              </div>
             </div>
           </div>
         </motion.div>
