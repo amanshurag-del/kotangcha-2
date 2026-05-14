@@ -13,6 +13,8 @@ export const ThreeStage: React.FC<ThreeStageProps> = ({ memories }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const monumentRef = useRef<MonumentScene | null>(null);
   const [hoveredMemory, setHoveredMemory] = useState<MemoryEntry | null>(null);
+  const hoveredMemoryRef = useRef<MemoryEntry | null>(null);
+  const isMouseInPopupRef = useRef(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const hoverAudioRef = useRef<HTMLAudioElement | null>(null);
   const fadeIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -81,7 +83,8 @@ export const ThreeStage: React.FC<ThreeStageProps> = ({ memories }) => {
             const hit = offeringIntersects[0].object as THREE.Mesh;
             const memory = monumentRef.current.meshToMemory.get(hit);
             if (memory) {
-              if (hoveredMemory !== memory) {
+              if (hoveredMemoryRef.current !== memory) {
+                hoveredMemoryRef.current = memory;
                 setHoveredMemory(memory);
               }
               
@@ -97,11 +100,15 @@ export const ThreeStage: React.FC<ThreeStageProps> = ({ memories }) => {
             }
           } else {
             // Hovering structure but not an offering memory
-            if (hoveredMemory) setHoveredMemory(null);
+            if (hoveredMemoryRef.current && !isMouseInPopupRef.current) {
+              hoveredMemoryRef.current = null;
+              setHoveredMemory(null);
+            }
             if (!isDragging) canvasRef.current!.style.cursor = 'default';
           }
         } else {
-          if (hoveredMemory) {
+          if (hoveredMemoryRef.current && !isMouseInPopupRef.current) {
+            hoveredMemoryRef.current = null;
             setHoveredMemory(null);
           }
           if (!isDragging) {
@@ -115,7 +122,10 @@ export const ThreeStage: React.FC<ThreeStageProps> = ({ memories }) => {
     const onMouseLeave = () => {
       if (!isDragging) {
         autoRotate = true;
-        setHoveredMemory(null);
+        if (!isMouseInPopupRef.current) {
+          hoveredMemoryRef.current = null;
+          setHoveredMemory(null);
+        }
       }
     };
 
@@ -177,6 +187,7 @@ export const ThreeStage: React.FC<ThreeStageProps> = ({ memories }) => {
             const hit = offeringIntersects[0].object as THREE.Mesh;
             const memory = monumentRef.current.meshToMemory.get(hit);
             if (memory) {
+              hoveredMemoryRef.current = memory;
               setHoveredMemory(memory);
               const vector = hit.position.clone();
               vector.project(monumentRef.current.camera);
@@ -187,7 +198,10 @@ export const ThreeStage: React.FC<ThreeStageProps> = ({ memories }) => {
             }
           } else {
             // Only clear if we're not actively dragging
-            if (!isDragging) setHoveredMemory(null);
+            if (!isDragging) {
+              hoveredMemoryRef.current = null;
+              setHoveredMemory(null);
+            }
           }
         }
       } else if (e.touches.length === 2) {
@@ -288,23 +302,50 @@ export const ThreeStage: React.FC<ThreeStageProps> = ({ memories }) => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
+            onMouseEnter={() => { isMouseInPopupRef.current = true; }}
+            onMouseLeave={() => { isMouseInPopupRef.current = false; }}
             style={{ 
               position: 'fixed', 
               left: mousePos.x, 
-              top: mousePos.y - 120, // Offset above the object
+              top: mousePos.y - (hoveredMemory.image ? 320 : 120), // Adjust offset based on content height
               transform: 'translateX(-50%)',
-              pointerEvents: 'none', 
+              pointerEvents: 'auto', 
               zIndex: 100 
             }}
             className="bg-[#faf9f7] border border-black/5 rounded-sm p-4 w-64 shadow-[0_15px_40px_rgba(0,0,0,0.12)] backdrop-blur-md"
           >
-            <div className="font-sans text-[12px] font-semibold mb-1 tracking-tight text-[#1a1917]">{hoveredMemory.name} · {hoveredMemory.place || 'Somewhere'}</div>
-            <div className="text-[#6b6760] font-sans text-[11px] mb-2 leading-snug">{hoveredMemory.object}</div>
-            <div className="text-[#b0ada8] font-sans text-[10.5px] italic leading-relaxed border-t border-black/5 pt-2">
-              {hoveredMemory.memory.length > 100 ? hoveredMemory.memory.slice(0, 100) + '…' : hoveredMemory.memory}
-            </div>
+            {hoveredMemory.image ? (
+              <div className="flex flex-col gap-3">
+                <div className="aspect-square w-full overflow-hidden rounded-[1px] bg-black/5">
+                  <img 
+                    src={hoveredMemory.image} 
+                    alt={hoveredMemory.object} 
+                    className="w-full h-full object-cover opacity-90 transition-opacity" 
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
+                <div>
+                  <div className="font-sans text-[11px] font-bold tracking-tight text-[#1a1917] flex justify-between items-baseline">
+                    <span>{hoveredMemory.name}</span>
+                    <span className="text-[#b0ada8] font-normal text-[10px]">{hoveredMemory.place}</span>
+                  </div>
+                  <div className="text-[#6b6760] font-sans text-[10px] mt-0.5 line-clamp-1">{hoveredMemory.object}</div>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="font-sans text-[12px] font-bold mb-1 tracking-tight text-[#1a1917]">{hoveredMemory.name} · {hoveredMemory.place || 'Somewhere'}</div>
+                <div className="text-[#6b6760] font-sans text-[11px] mb-2 leading-snug">{hoveredMemory.object}</div>
+                <div className="text-[#b0ada8] font-sans text-[10.5px] italic leading-relaxed border-t border-black/5 pt-2">
+                  {hoveredMemory.memory.length > 100 ? hoveredMemory.memory.slice(0, 100) + '…' : hoveredMemory.memory}
+                </div>
+              </>
+            )}
             {hoveredMemory.audio && (
-              <div className="mt-1 text-[10px] text-[#c4a882] uppercase tracking-widest font-medium">♪ Sound offering</div>
+              <div className="mt-2 text-[9px] text-[#a36910] uppercase tracking-[0.2em] font-bold border-t border-black/5 pt-2 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 bg-[#a36910] rounded-full animate-pulse" />
+                Sound offering
+              </div>
             )}
           </motion.div>
         )}
