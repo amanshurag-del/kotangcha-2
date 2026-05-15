@@ -9,7 +9,10 @@
     "rewrites": [
       {
         "source": "**",
-        "destination": "/index.html"
+        "run": {
+          "serviceId": "kotangcha",
+          "region": "asia-south1"
+        }
       }
     ]
   },
