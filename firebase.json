@@ -10,8 +10,8 @@
       {
         "source": "**",
         "run": {
-          "serviceId": "kotangcha",
-          "region": "asia-south1"
+          "serviceId": "kotangcha-site",
+          "region": "us-central1"
         }
       }
     ]
