@@ -129,7 +129,7 @@ export const ArchiveDrawer: React.FC<DrawerProps & {
                               Sound
                             </div>
                           )}
-                          {m.verified === false && (
+                          {!m.verified && (
                             <div className="px-2 py-0.5 bg-amber-50 border border-amber-200 rounded-sm text-[9px] text-amber-700 uppercase tracking-widest font-medium">
                               Pending
                             </div>
@@ -141,7 +141,7 @@ export const ArchiveDrawer: React.FC<DrawerProps & {
 
                         {isLoggedIn && (
                           <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-black/5 opacity-0 group-hover:opacity-100 transition-opacity">
-                            {m.verified === false && (
+                            {!m.verified && (
                               <button 
                                 onClick={(e) => { e.stopPropagation(); onVerify(m.id.toString(), true); }}
                                 className="w-full py-2 bg-[#7a5c3a] text-white text-[10px] uppercase tracking-widest rounded-sm hover:opacity-90"

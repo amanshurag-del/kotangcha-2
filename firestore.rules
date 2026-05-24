@@ -61,8 +61,7 @@ service cloud.firestore {
       );
 
       allow update: if (
-        isAdmin() && 
-        isValidMemory(incoming())
+        isAdmin()
       );
 
       allow delete: if isAdmin();
