@@ -221,19 +221,6 @@ export default function App() {
         <ThreeStage memories={memories} />
       </div>
 
-      <footer className="fixed bottom-6 md:bottom-10 inset-x-0 z-10 text-center pointer-events-none px-6">
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1, duration: 1.5 }}
-          className="max-w-md mx-auto"
-        >
-          <p className="text-[10px] md:text-[12px] leading-relaxed text-[#6b6760] font-sans font-light tracking-[0.05em]">
-            Each stone is a remembered object, a whispered name, a fragment of history. The kotangcha grows with every offering — you are invited to add your own.
-          </p>
-        </motion.div>
-      </footer>
-
       <ArchiveDrawer 
         isOpen={activeDrawer === 'archive'} 
         onClose={() => setActiveDrawer(null)}

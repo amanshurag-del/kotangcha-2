@@ -11,7 +11,7 @@ export class MonumentScene {
   public structureMeshes: THREE.Mesh[] = [];
   public meshToMemory = new Map<THREE.Mesh, MemoryEntry>();
   
-  private targetVector = new THREE.Vector3(0, 5, 0);
+  private targetVector = new THREE.Vector3(0, 6.0, 0);
   private animTime = 0;
   private ft = 0;
 
@@ -213,8 +213,8 @@ export class MonumentScene {
     this.animTime += 0.008;
     this.ft += 0.035;
 
-    // Remove floating movement as requested by "remove this" in monument area
-    this.targetVector.y = 5;
+    // Vertically & horizontally center the entire structure (stone cairn, offerings, pole, flag)
+    this.targetVector.set(0, 6.0, 0);
 
     this.camera.position.set(
       this.targetVector.x + radius * Math.sin(phi) * Math.sin(theta),
