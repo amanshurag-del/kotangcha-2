@@ -322,7 +322,7 @@ export const ConnectDrawer: React.FC<DrawerProps & {
                         onClick={onLogin}
                         className="px-10 py-3.5 border border-black/10 text-[#6b6760] font-sans text-[9px] tracking-[0.25em] uppercase rounded-sm hover:bg-black/5 transition-all"
                       >
-                        Artist Sign In ↗
+                        Admin Sign In ↗
                       </button>
                     </div>
                   )}
